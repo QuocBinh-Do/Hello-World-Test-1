@@ -3,7 +3,7 @@ export type Transaction = {
   title: string;
   subtitle: string;
   amount: number;
-  timestamp: string;
+  datetime: string;
   iconLabel: string;
   iconBg: string;
 };
@@ -28,25 +28,25 @@ export const TRANSACTIONS: Transaction[] = [
     title: 'Nạp tiền điện thoại',
     subtitle: 'Thành công - 0908 123 456',
     amount: -50000,
-    timestamp: '12/03/2024 - 15:30',
+    datetime: '12/03/2024 - 15:30',
     iconLabel: '📱',
-    iconBg: '#FFE8F3',
+    iconBg: '#FFE6F2',
   },
   {
     id: '2',
     title: 'Nạp tiền vào ví từ MB Bank',
     subtitle: 'Thành công - **** 5678',
     amount: 200000,
-    timestamp: '10/03/2024 - 09:15',
+    datetime: '10/03/2024 - 09:15',
     iconLabel: 'MB',
     iconBg: '#E8F5E9',
   },
   {
     id: '3',
-    title: 'Chuyển tiền đến Nguyễn Văn A',
+    title: 'Chuyển tiền đến Nguyễn A',
     subtitle: 'Thành công - MoMo',
     amount: -150000,
-    timestamp: '08/03/2024 - 18:42',
+    datetime: '08/03/2024 - 18:42',
     iconLabel: '💸',
     iconBg: '#E3F2FD',
   },
@@ -55,7 +55,7 @@ export const TRANSACTIONS: Transaction[] = [
     title: 'Thanh toán hóa đơn điện',
     subtitle: 'Thành công - EVN',
     amount: -320000,
-    timestamp: '05/03/2024 - 11:05',
+    datetime: '05/03/2024 - 11:05',
     iconLabel: '⚡',
     iconBg: '#FFF8E1',
   },
@@ -63,15 +63,15 @@ export const TRANSACTIONS: Transaction[] = [
 
 export function formatVnd(amount: number): string {
   const abs = Math.abs(amount).toLocaleString('vi-VN');
-  return amount < 0 ? `-${abs}đ` : `+${abs}đ`;
+  return `${amount < 0 ? '-' : '+'}${abs}đ`;
 }
 
-export function filterTransactions(query: string): Transaction[] {
+export function searchTransactions(query: string): Transaction[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
   return TRANSACTIONS.filter(
     (t) =>
       t.title.toLowerCase().includes(q) ||
-      t.subtitle.toLowerCase().includes(q),
+      t.subtitle.toLowerCase().includes(q)
   );
 }

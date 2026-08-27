@@ -1,21 +1,20 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { formatVnd, type Transaction } from '../data/transactions';
-import { colors, radius, spacing } from '../theme/tokens';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, radius, spacing } from '../theme/momo';
+import { Transaction, formatVnd } from '../data/transactions';
 
 type Props = {
   item: Transaction;
 };
 
 export function TransactionRow({ item }: Props) {
-  const isCredit = item.amount > 0;
-
+  const isIn = item.amount > 0;
   return (
     <View style={styles.row}>
-      <View style={[styles.avatar, { backgroundColor: item.iconBg }]}>
-        <Text style={styles.avatarText}>{item.iconLabel}</Text>
+      <View style={[styles.icon, { backgroundColor: item.iconBg }]}>
+        <Text style={styles.iconText}>{item.iconLabel}</Text>
       </View>
-      <View style={styles.center}>
+      <View style={styles.mid}>
         <Text style={styles.title} numberOfLines={1}>
           {item.title}
         </Text>
@@ -24,10 +23,10 @@ export function TransactionRow({ item }: Props) {
         </Text>
       </View>
       <View style={styles.right}>
-        <Text style={[styles.amount, isCredit && styles.amountCredit]}>
+        <Text style={[styles.amount, isIn && styles.amountIn]}>
           {formatVnd(item.amount)}
         </Text>
-        <Text style={styles.time}>{item.timestamp}</Text>
+        <Text style={styles.time}>{item.datetime}</Text>
       </View>
     </View>
   );
@@ -39,29 +38,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    gap: spacing.md,
-    backgroundColor: colors.bgDefault,
+    backgroundColor: colors.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.circle,
+  icon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: spacing.md,
   },
-  avatarText: {
+  iconText: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.pink700,
+    color: colors.pink500,
   },
-  center: {
+  mid: {
     flex: 1,
-    gap: 2,
+    marginRight: spacing.sm,
   },
   title: {
     fontSize: 15,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
+    marginBottom: 2,
   },
   subtitle: {
     fontSize: 12,
@@ -69,15 +71,15 @@ const styles = StyleSheet.create({
   },
   right: {
     alignItems: 'flex-end',
-    gap: 2,
   },
   amount: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.amountDebit,
+    color: colors.amountOut,
+    marginBottom: 2,
   },
-  amountCredit: {
-    color: colors.amountCredit,
+  amountIn: {
+    color: colors.amountIn,
   },
   time: {
     fontSize: 11,

@@ -1,113 +1,107 @@
 import React, { useMemo, useState } from 'react';
 import {
-  FlatList,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import { EmptySearchState } from '../components/EmptySearchState';
 import { SearchHeader } from '../components/SearchHeader';
-import { SearchHistoryList } from '../components/SearchHistoryList';
 import { SuggestionChips } from '../components/SuggestionChips';
+import { SearchHistoryList } from '../components/SearchHistoryList';
 import { TransactionRow } from '../components/TransactionRow';
+import { EmptySearchState } from '../components/EmptySearchState';
 import {
   INITIAL_HISTORY,
   SUGGESTIONS,
-  filterTransactions,
+  searchTransactions,
 } from '../data/transactions';
-import { colors, spacing } from '../theme/tokens';
+import { colors, spacing } from '../theme/momo';
 
-type Mode = 'idle' | 'results' | 'empty';
-
-/**
- * Figma node 10132:53944 — Kết quả tính năng tìm kiếm
- * Screens: Gợi ý + lịch sử | Kết quả | Empty state
- */
 export function TransactionSearchScreen() {
-  const [query, setQuery] = useState('nạp');
+  const [query, setQuery] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [history, setHistory] = useState(INITIAL_HISTORY);
-  const [mode, setMode] = useState<Mode>('idle');
-  const [committedQuery, setCommittedQuery] = useState('');
 
   const results = useMemo(
-    () => filterTransactions(committedQuery),
-    [committedQuery],
+    () => (submitted ? searchTransactions(query) : []),
+    [query, submitted]
   );
 
-  const runSearch = (raw: string) => {
-    const q = raw.trim();
-    Keyboard.dismiss();
-    if (!q) {
-      setMode('idle');
-      setCommittedQuery('');
-      return;
-    }
-    setQuery(q);
-    setCommittedQuery(q);
-    setHistory((prev) => [q, ...prev.filter((h) => h !== q)].slice(0, 8));
-    const found = filterTransactions(q);
-    setMode(found.length > 0 ? 'results' : 'empty');
-  };
+  const showIdle = !submitted;
+  const showResults = submitted && results.length > 0;
+  const showEmpty = submitted && results.length === 0;
 
-  const onChangeText = (text: string) => {
+  const applyQuery = (text: string) => {
     setQuery(text);
-    if (mode !== 'idle') {
-      setMode('idle');
-      setCommittedQuery('');
+    setSubmitted(true);
+    const trimmed = text.trim();
+    if (trimmed && !history.includes(trimmed)) {
+      setHistory((prev) => [trimmed, ...prev].slice(0, 10));
     }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <SearchHeader
-        value={query}
-        onChangeText={onChangeText}
-        onClear={() => {
-          setQuery('');
-          setMode('idle');
-          setCommittedQuery('');
-        }}
-        onCancel={() => {
-          setQuery('');
-          setMode('idle');
-          setCommittedQuery('');
-        }}
-        onSubmit={() => runSearch(query)}
-      />
-      <View style={styles.divider} />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <SearchHeader
+          value={query}
+          onChangeText={(t) => {
+            setQuery(t);
+            if (submitted) setSubmitted(false);
+          }}
+          onClear={() => {
+            setQuery('');
+            setSubmitted(false);
+          }}
+          onCancel={() => {
+            setQuery('');
+            setSubmitted(false);
+          }}
+          onSubmit={() => applyQuery(query)}
+        />
 
-      {mode === 'idle' ? (
-        <View style={styles.body}>
-          <SuggestionChips items={SUGGESTIONS} onSelect={runSearch} />
-          <SearchHistoryList
-            items={history}
-            onSelect={runSearch}
-            onRemove={(item) =>
-              setHistory((prev) => prev.filter((h) => h !== item))
-            }
-          />
-        </View>
-      ) : null}
+        {showIdle ? (
+          <View style={styles.flex}>
+            <Text style={styles.section}>Gợi ý cho bạn</Text>
+            <SuggestionChips
+              items={SUGGESTIONS}
+              onPress={(item) => applyQuery(item)}
+            />
+            <Text style={[styles.section, styles.sectionSpaced]}>
+              Lịch sử tìm kiếm
+            </Text>
+            <SearchHistoryList
+              items={history}
+              onPress={(item) => applyQuery(item)}
+              onRemove={(item) =>
+                setHistory((prev) => prev.filter((h) => h !== item))
+              }
+            />
+          </View>
+        ) : null}
 
-      {mode === 'results' ? (
-        <FlatList
-          data={results}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={
+        {showResults ? (
+          <View style={styles.flex}>
             <Text style={styles.resultCount}>
               Tìm thấy {results.length} giao dịch
             </Text>
-          }
-          renderItem={({ item }) => <TransactionRow item={item} />}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContent}
-          keyboardShouldPersistTaps="handled"
-        />
-      ) : null}
+            <FlatList
+              data={results}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <TransactionRow item={item} />}
+              contentContainerStyle={styles.list}
+            />
+          </View>
+        ) : null}
 
-      {mode === 'empty' ? <EmptySearchState /> : null}
+        {showEmpty ? <EmptySearchState /> : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -115,28 +109,32 @@ export function TransactionSearchScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.bgDefault,
+    backgroundColor: colors.bg,
   },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
-  },
-  body: {
+  flex: {
     flex: 1,
   },
-  resultCount: {
+  section: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
+  },
+  sectionSpaced: {
+    marginTop: spacing.md,
+  },
+  resultCount: {
     fontSize: 13,
+    fontWeight: '600',
     color: colors.textSecondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.bg,
   },
-  listContent: {
+  list: {
+    backgroundColor: colors.surface,
     paddingBottom: spacing.xxl,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
-    marginLeft: 72,
   },
 });

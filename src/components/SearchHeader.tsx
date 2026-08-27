@@ -1,12 +1,12 @@
 import React from 'react';
 import {
+  View,
+  TextInput,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
-  View,
 } from 'react-native';
-import { colors, radius, spacing } from '../theme/tokens';
+import { colors, radius, spacing } from '../theme/momo';
 
 type Props = {
   value: string;
@@ -17,34 +17,31 @@ type Props = {
   placeholder?: string;
 };
 
-/** MoMo UI Kit: InputSearch + Top Navigation search pattern */
 export function SearchHeader({
   value,
   onChangeText,
   onClear,
   onCancel,
   onSubmit,
-  placeholder = 'Tìm kiếm giao dịch',
+  placeholder = 'Tìm giao dịch',
 }: Props) {
   return (
     <View style={styles.row}>
-      <Pressable onPress={onCancel} hitSlop={8} style={styles.backBtn}>
-        <Text style={styles.backIcon}>‹</Text>
-      </Pressable>
-      <View style={styles.inputWrap}>
-        <Text style={styles.searchIcon}>⌕</Text>
+      <View style={styles.field}>
+        <Text style={styles.leading}>🔍</Text>
         <TextInput
+          style={styles.input}
           value={value}
           onChangeText={onChangeText}
-          onSubmitEditing={onSubmit}
           placeholder={placeholder}
           placeholderTextColor={colors.textTertiary}
           returnKeyType="search"
+          onSubmitEditing={onSubmit}
           autoFocus
-          style={styles.input}
+          autoCorrect={false}
         />
         {value.length > 0 ? (
-          <Pressable onPress={onClear} hitSlop={8}>
+          <Pressable onPress={onClear} hitSlop={8} accessibilityLabel="Xóa">
             <View style={styles.clearBtn}>
               <Text style={styles.clearText}>×</Text>
             </View>
@@ -64,56 +61,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    gap: spacing.sm,
-    backgroundColor: colors.bgDefault,
+    backgroundColor: colors.surface,
+    gap: spacing.md,
   },
-  backBtn: {
-    width: 28,
-    alignItems: 'center',
-  },
-  backIcon: {
-    fontSize: 32,
-    lineHeight: 34,
-    color: colors.textPrimary,
-    marginTop: -4,
-  },
-  inputWrap: {
+  field: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.bgSecondary,
+    backgroundColor: colors.searchBg,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     height: 40,
-    gap: spacing.sm,
   },
-  searchIcon: {
-    fontSize: 16,
-    color: colors.iconMuted,
+  leading: {
+    fontSize: 14,
+    marginRight: spacing.sm,
   },
   input: {
     flex: 1,
     fontSize: 15,
-    color: colors.textPrimary,
+    color: colors.text,
     paddingVertical: 0,
   },
   clearBtn: {
     width: 18,
     height: 18,
-    borderRadius: radius.circle,
+    borderRadius: 9,
     backgroundColor: colors.textTertiary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   clearText: {
-    color: colors.bgDefault,
+    color: colors.surface,
     fontSize: 14,
     lineHeight: 16,
     marginTop: -1,
   },
   cancel: {
     fontSize: 15,
-    color: colors.textPink,
+    color: colors.pink500,
     fontWeight: '600',
   },
 });

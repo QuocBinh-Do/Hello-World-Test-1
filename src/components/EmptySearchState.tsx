@@ -1,13 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing } from '../theme/tokens';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, spacing } from '../theme/momo';
 
 export function EmptySearchState() {
   return (
     <View style={styles.wrap}>
       <View style={styles.illustration}>
-        <Text style={styles.magnifier}>⌕</Text>
-        <Text style={styles.question}>?</Text>
+        <Text style={styles.emoji}>🔍</Text>
+        <Text style={styles.q}>?</Text>
       </View>
       <Text style={styles.title}>Không tìm thấy kết quả</Text>
       <Text style={styles.subtitle}>
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xxl,
-    gap: spacing.md,
+    paddingBottom: 80,
   },
   illustration: {
     width: 96,
@@ -32,24 +32,24 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pink50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xl,
   },
-  magnifier: {
+  emoji: {
     fontSize: 40,
-    color: colors.pink400,
   },
-  question: {
+  q: {
     position: 'absolute',
-    right: 22,
+    right: 18,
     top: 18,
     fontSize: 18,
-    fontWeight: '700',
-    color: colors.pink600,
+    fontWeight: '800',
+    color: colors.pink500,
   },
   title: {
     fontSize: 17,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: colors.text,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   subtitle: {

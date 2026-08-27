@@ -1,33 +1,30 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing } from '../theme/tokens';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { colors, spacing } from '../theme/momo';
 
 type Props = {
   items: string[];
-  onSelect: (item: string) => void;
+  onPress: (item: string) => void;
   onRemove: (item: string) => void;
 };
 
-export function SearchHistoryList({ items, onSelect, onRemove }: Props) {
-  if (items.length === 0) return null;
-
+export function SearchHistoryList({ items, onPress, onRemove }: Props) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.title}>Lịch sử tìm kiếm</Text>
+    <View>
       {items.map((item) => (
         <Pressable
           key={item}
-          onPress={() => onSelect(item)}
-          style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+          style={styles.row}
+          onPress={() => onPress(item)}
         >
-          <Text style={styles.clock}>◷</Text>
+          <Text style={styles.clock}>🕐</Text>
           <Text style={styles.label} numberOfLines={1}>
             {item}
           </Text>
           <Pressable
             onPress={() => onRemove(item)}
             hitSlop={10}
-            style={styles.removeHit}
+            accessibilityLabel={`Xóa ${item}`}
           >
             <Text style={styles.remove}>×</Text>
           </Pressable>
@@ -38,43 +35,27 @@ export function SearchHistoryList({ items, onSelect, onRemove }: Props) {
 }
 
 const styles = StyleSheet.create({
-  section: {
-    paddingTop: spacing.xl,
-  },
-  title: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.sm,
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    gap: spacing.md,
-  },
-  rowPressed: {
-    backgroundColor: colors.bgSecondary,
+    backgroundColor: colors.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   clock: {
     fontSize: 16,
-    color: colors.iconMuted,
-    width: 20,
-    textAlign: 'center',
+    marginRight: spacing.md,
   },
   label: {
     flex: 1,
     fontSize: 15,
-    color: colors.textPrimary,
-  },
-  removeHit: {
-    width: 28,
-    alignItems: 'center',
+    color: colors.text,
   },
   remove: {
-    fontSize: 20,
+    fontSize: 22,
     color: colors.textTertiary,
+    paddingHorizontal: spacing.xs,
   },
 });
